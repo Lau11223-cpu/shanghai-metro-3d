@@ -38,3 +38,6 @@ docker/*.log
 # Environment (extra safety, backend/.env etc.)
 backend/.env
 backend/.env.local
+
+# Docker env with credentials
+docker/.env
