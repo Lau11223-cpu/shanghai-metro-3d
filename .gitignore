@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backend
+backend/node_modules
+backend/dist
+
+# Raw data (usually too large for git)
+data/*
+!data/.gitkeep
+
+# Docker volumes / logs
+docker/volumes/
+docker/*.log
+
+# Environment (extra safety, backend/.env etc.)
+backend/.env
+backend/.env.local
