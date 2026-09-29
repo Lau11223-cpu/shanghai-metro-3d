@@ -2,8 +2,9 @@ import 'dotenv/config'
 import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import { pool, query } from './db.js'
+import metroRouter from './routes/metro.js'
 
-const app = express()
+const app = express()   //整个后端服务的总入口
 const PORT = Number(process.env.PORT) || 3000
 
 // ==== 中间件 ====
@@ -15,6 +16,10 @@ app.use((req, _res, next) => {
   console.log(`[api] ${req.method} ${req.path}`)
   next()
 })
+
+// ==== 地铁业务路由 ====
+app.use('/api/metro', metroRouter) //明确建立了父路径与子路由的关系
+
 
 // ==== /health 路由 ====
 app.get('/health', async (_req: Request, res: Response) => {
