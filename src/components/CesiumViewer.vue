@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import * as Cesium from 'cesium'
+import { getMetroLines } from '../api/metro'
 
 Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN
 
@@ -13,6 +14,30 @@ onMounted(async () => {
     terrain: Cesium.Terrain.fromWorldTerrain(),
   })
 
+  const metroData = await getMetroLines()
+
+  console.log('地铁数据：', metroData)
+  console.log('线路数量：', metroData.features.length)
+
+  const metroDataSource = await Cesium.GeoJsonDataSource.load(metroData, {
+  stroke: Cesium.Color.RED,
+  strokeWidth: 4,
+  clampToGround: true,
+  })
+
+  for (const entity of metroDataSource.entities.values) {
+  const properties = entity.properties?.getValue(Cesium.JulianDate.now())
+  const lineColor = Cesium.Color.fromCssColorString(properties?.colour)
+
+  if (entity.polyline && lineColor) {
+    entity.polyline.material =
+      new Cesium.ColorMaterialProperty(lineColor)
+    }
+  }
+
+  await viewer.dataSources.add(metroDataSource)
+
+
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(121.4944, 31.2236, 15000),
     orientation: {
@@ -23,6 +48,8 @@ onMounted(async () => {
     duration: 5,
   })
 })
+
+
 
 onBeforeUnmount(() => {
   viewer?.destroy()
