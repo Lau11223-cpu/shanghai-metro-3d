@@ -38,6 +38,42 @@ onMounted(async () => {
   await viewer.dataSources.add(metroDataSource)
 
 
+
+
+  for (const feature of metroData.features) {
+    const wallColor =
+      Cesium.Color.fromCssColorString(feature.properties?.colour) ??
+      Cesium.Color.RED
+
+    const lines =
+      feature.geometry.type === 'MultiLineString'
+        ? feature.geometry.coordinates
+        : [feature.geometry.coordinates]
+
+    for (const coordinates of lines) {
+      if (coordinates.length < 2) continue
+
+      const positions = coordinates.map(
+        ([longitude, latitude]: number[]) =>
+          Cesium.Cartesian3.fromDegrees(longitude, latitude),
+      )
+
+      viewer.entities.add({
+        wall: {
+          positions,
+          minimumHeights: new Array(positions.length).fill(0),
+          maximumHeights: new Array(positions.length).fill(150),
+          material: wallColor.withAlpha(0.35),
+        },
+      })
+    }
+  }
+
+
+
+
+
+
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(121.4944, 31.2236, 15000),
     orientation: {
