@@ -7,3 +7,12 @@ export async function getMetroLines() {
 
   return response.data
 }
+
+
+export async function getMetroStations() {
+  const response = await axios.get(
+    'http://localhost:3000/api/metro/stations',
+  )
+
+  return response.data
+}

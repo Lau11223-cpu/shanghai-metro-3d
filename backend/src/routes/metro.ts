@@ -55,4 +55,37 @@ router.get('/lines', async (_req: Request, res: Response) => {
   }
 })
 
+
+
+router.get('/stations', async (_req, res) => {
+  try {
+    const result = await query(`
+      SELECT
+        name,
+        ST_AsGeoJSON(geom)::json AS geometry
+      FROM metro.stations
+      WHERE geom IS NOT NULL
+      ORDER BY name
+    `)
+
+    res.json({
+      type: 'FeatureCollection',
+      features: result.rows.map((row) => ({
+        type: 'Feature',
+        properties: {
+          name: row.name,
+        },
+        geometry: row.geometry,
+      })),
+    })
+  } catch (error) {
+    console.error('[metro/stations] query failed:', error)
+    res.status(500).json({
+      error: 'Failed to load metro stations',
+    })
+  }
+})
+
+
+
 export default router

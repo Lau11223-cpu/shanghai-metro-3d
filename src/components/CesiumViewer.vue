@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import * as Cesium from 'cesium'
-import { getMetroLines } from '../api/metro'
+import { getMetroLines, getMetroStations } from '../api/metro'
 
 Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN
 
@@ -18,6 +18,22 @@ onMounted(async () => {
 
   console.log('地铁数据：', metroData)
   console.log('线路数量：', metroData.features.length)
+
+
+  const stationData = await getMetroStations()
+
+  console.log('站点数据：', stationData)
+  console.log('站点数量：', stationData.features.length)
+
+  const stationDataSource = await Cesium.GeoJsonDataSource.load(stationData, {
+    markerColor: Cesium.Color.WHITE,
+    markerSize: 10,
+    clampToGround: true,
+  })
+
+  await viewer.dataSources.add(stationDataSource)
+
+
 
   const metroDataSource = await Cesium.GeoJsonDataSource.load(metroData, {
   stroke: Cesium.Color.RED,
