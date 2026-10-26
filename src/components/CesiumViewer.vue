@@ -7,12 +7,40 @@ Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN
 
 const containerRef = ref<HTMLDivElement | null>(null)
 let viewer: Cesium.Viewer | null = null
+let removeSelectionListener: (() => void) | undefined
 
 onMounted(async () => {
   if (!containerRef.value) return
   viewer = new Cesium.Viewer(containerRef.value, {
     terrain: Cesium.Terrain.fromWorldTerrain(),
   })
+
+  // 记录上一次选中的墙体及其原始材质
+  let selectedWall: Cesium.WallGraphics | undefined
+  let originalMaterial: Cesium.MaterialProperty | undefined
+
+  removeSelectionListener =
+    viewer.selectedEntityChanged.addEventListener(
+      (entity: Cesium.Entity | undefined) => {
+        // 先恢复上一次选中墙体的颜色和透明度
+        if (selectedWall) {
+          selectedWall.material = originalMaterial
+        }
+
+        selectedWall = undefined
+        originalMaterial = undefined
+
+        // 如果这次选中的是墙体，将它改成黄色
+        if (entity?.wall) {
+          selectedWall = entity.wall
+          originalMaterial = selectedWall.material
+
+          selectedWall.material = new Cesium.ColorMaterialProperty(
+            Cesium.Color.YELLOW.withAlpha(0.8),
+          )
+        }
+      },
+    )
 
   const metroData = await getMetroLines()
 
@@ -110,6 +138,9 @@ onMounted(async () => {
 
 
 onBeforeUnmount(() => {
+  removeSelectionListener?.()
+  removeSelectionListener = undefined
+
   viewer?.destroy()
   viewer = null
 })
