@@ -36,7 +36,7 @@ onMounted(async () => {
           originalMaterial = selectedWall.material
 
           selectedWall.material = new Cesium.ColorMaterialProperty(
-            Cesium.Color.YELLOW.withAlpha(0.8),
+            Cesium.Color.WHITE.withAlpha(0.8),
           )
         }
       },
