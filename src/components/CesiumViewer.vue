@@ -75,6 +75,12 @@ onMounted(async () => {
       )
 
       viewer.entities.add({
+        name: feature.properties?.name || feature.properties?.ref || '地铁线路',
+        description: `
+          <p>线路编号：${feature.properties?.ref ?? '暂无'}</p>
+          <p>运营单位：${feature.properties?.operator ?? '暂无'}</p>
+          <p>线路颜色：${feature.properties?.colour ?? '暂无'}</p>
+        `,
         wall: {
           positions,
           minimumHeights: new Array(positions.length).fill(0),
